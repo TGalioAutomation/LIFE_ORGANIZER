@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Color Palette
-  static const Color primaryColor = Color(0xFF2196F3);
-  static const Color primaryVariant = Color(0xFF1976D2);
-  static const Color secondaryColor = Color(0xFF03DAC6);
-  static const Color secondaryVariant = Color(0xFF018786);
+  // Modern Color Palette - Material Design 3
+  static const Color primaryColor = Color(0xFF6366F1); // Indigo
+  static const Color primaryVariant = Color(0xFF4F46E5);
+  static const Color secondaryColor = Color(0xFF10B981); // Emerald
+  static const Color secondaryVariant = Color(0xFF059669);
+  static const Color accentColor = Color(0xFFF59E0B); // Amber
   
   // Expense Colors
   static const Color expenseColor = Color(0xFFE53935);
@@ -89,16 +90,24 @@ class AppTheme {
         onBackground: onBackground,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: primaryColor,
-        foregroundColor: onPrimary,
+        backgroundColor: surfaceColor,
+        foregroundColor: onSurface,
         elevation: 0,
         centerTitle: true,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: TextStyle(
+          color: onSurface,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       cardTheme: CardTheme(
         elevation: 2,
+        shadowColor: Colors.black12,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

@@ -15,6 +15,11 @@ from .serializers import (
     NotificationSummarySerializer, UserEngagementSerializer
 )
 
+# Import models from other apps
+from expenses.models import Transaction, Budget
+from tasks.models import Task
+from goals.models import Goal, GoalProgress
+
 # Import models from other apps for dashboard data
 from expenses.models import Transaction, Budget
 from tasks.models import Task
@@ -304,9 +309,10 @@ class DashboardOverviewView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        now = timezone.now()
-        current_month = now.replace(day=1).date()
+        try:
+            user = request.user
+            now = timezone.now()
+            current_month = now.replace(day=1).date()
 
         # Financial summary
         transactions = Transaction.objects.filter(
@@ -348,9 +354,20 @@ class DashboardOverviewView(APIView):
         active_goals = goals.filter(status='active').count()
         completed_goals = goals.filter(status='completed').count()
 
-        # Average goal progress
-        active_goal_progress = goals.filter(status='active').values_list('progress_percentage', flat=True)
-        average_goal_progress = sum(active_goal_progress) / len(active_goal_progress) if active_goal_progress else 0
+        # Average goal progress - Fix the field name issue
+        active_goals_with_progress = goals.filter(status='active')
+        if active_goals_with_progress.exists():
+            # Calculate progress percentage from current_value and target_value
+            total_progress = 0
+            count = 0
+            for goal in active_goals_with_progress:
+                if goal.target_value and goal.target_value > 0:
+                    progress = (goal.current_value / goal.target_value) * 100
+                    total_progress += min(progress, 100)  # Cap at 100%
+                    count += 1
+            average_goal_progress = total_progress / count if count > 0 else 0
+        else:
+            average_goal_progress = 0
 
         # Recent data
         recent_transactions = Transaction.objects.filter(user=user).order_by('-transaction_date')[:5]
@@ -405,7 +422,12 @@ class DashboardOverviewView(APIView):
             ]
         }
 
-        return Response(overview_data)
+            return Response(overview_data)
+        except Exception as e:
+            return Response(
+                {'error': 'Failed to fetch dashboard overview', 'details': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class DashboardPreferencesView(APIView):
