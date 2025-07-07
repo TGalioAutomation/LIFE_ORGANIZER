@@ -12,6 +12,17 @@ class AppTheme {
   static const Color expenseColor = Color(0xFFE53935);
   static const Color incomeColor = Color(0xFF43A047);
   static const Color budgetColor = Color(0xFFFF9800);
+
+  // Status Colors
+  static const Color successColor = Color(0xFF22C55E);
+  static const Color warningColor = Color(0xFFF59E0B);
+  static const Color errorColor = Color(0xFFEF4444);
+
+  // Priority Colors
+  static const Color lowPriority = Color(0xFF6B7280);
+  static const Color mediumPriority = Color(0xFFF59E0B);
+  static const Color highPriority = Color(0xFFEF4444);
+  static const Color urgentPriority = Color(0xFF7C2D12);
   
   // Task Priority Colors
   static const Color lowPriority = Color(0xFF4CAF50);
@@ -28,6 +39,13 @@ class AppTheme {
   // Neutral Colors
   static const Color backgroundColor = Color(0xFFF5F5F5);
   static const Color surfaceColor = Color(0xFFFFFFFF);
+  static const Color onPrimary = Color(0xFFFFFFFF);
+  static const Color onSurface = Color(0xFF1F2937);
+  static const Color onBackground = Color(0xFF1F2937);
+
+  // Dark Theme Colors
+  static const Color darkSurfaceColor = Color(0xFF1F2937);
+  static const Color darkOnSurface = Color(0xFFFFFFFF);
   static const Color errorColor = Color(0xFFE53935);
   static const Color onPrimary = Color(0xFFFFFFFF);
   static const Color onSurface = Color(0xFF212121);
@@ -101,7 +119,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shadowColor: Colors.black12,
         shape: RoundedRectangleBorder(
@@ -157,7 +175,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: true,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         color: darkSurfaceColor,
         shape: RoundedRectangleBorder(
@@ -190,4 +208,41 @@ class AppTheme {
       ),
     );
   }
+
+  // Text Styles
+  static const TextStyle headingLarge = TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+    color: onSurface,
+  );
+
+  static const TextStyle headingMedium = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.w600,
+    color: onSurface,
+  );
+
+  static const TextStyle headingSmall = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+    color: onSurface,
+  );
+
+  static const TextStyle bodyLarge = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+    color: onSurface,
+  );
+
+  static const TextStyle bodyMedium = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    color: onSurface,
+  );
+
+  static const TextStyle bodySmall = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.normal,
+    color: onSurface,
+  );
 }
