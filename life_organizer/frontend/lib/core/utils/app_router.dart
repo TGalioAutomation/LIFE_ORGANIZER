@@ -40,27 +40,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RegisterPage(),
       ),
 
-      // Main App Routes with Bottom Navigation
-      ShellRoute(
-        builder: (context, state, child) => MainNavigation(child: child),
-        routes: [
-          GoRoute(
-            path: AppRoutes.dashboard,
-            builder: (context, state) => const DashboardScreen(),
-          ),
-          GoRoute(
-            path: AppRoutes.expenses,
-            builder: (context, state) => const ExpensesScreen(),
-          ),
-          GoRoute(
-            path: AppRoutes.tasks,
-            builder: (context, state) => const TasksScreen(),
-          ),
-          GoRoute(
-            path: AppRoutes.goals,
-            builder: (context, state) => const GoalsPage(),
-          ),
-        ],
+      // Main App Routes - Simplified without ShellRoute
+      GoRoute(
+        path: AppRoutes.dashboard,
+        builder: (context, state) => MainNavigation(
+          child: const DashboardScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.expenses,
+        builder: (context, state) => MainNavigation(
+          child: const ExpensesScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.tasks,
+        builder: (context, state) => MainNavigation(
+          child: const TasksScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.goals,
+        builder: (context, state) => MainNavigation(
+          child: const GoalsPage(),
+        ),
       ),
     ],
     errorBuilder: (context, state) => const ErrorPage(),
