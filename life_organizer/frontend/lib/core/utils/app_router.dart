@@ -2,16 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/pages/register_page.dart';
-import '../../features/dashboard/presentation/pages/dashboard_page.dart';
-import '../../features/expenses/presentation/pages/expenses_page.dart';
-import '../../features/expenses/presentation/pages/add_expense_page.dart';
-import '../../features/tasks/presentation/pages/tasks_page.dart';
-import '../../features/tasks/presentation/pages/add_task_page.dart';
-import '../../features/goals/presentation/pages/goals_page.dart';
-import '../../features/goals/presentation/pages/add_goal_page.dart';
-import '../../shared/widgets/main_navigation.dart';
+import '../../features/dashboard/screens/dashboard_screen.dart';
+import '../../features/expenses/screens/expenses_screen.dart';
+import '../../features/tasks/screens/tasks_screen.dart';
 
 // Route names
 class AppRoutes {
@@ -31,7 +24,7 @@ class AppRoutes {
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: AppRoutes.splash,
+    initialLocation: AppRoutes.dashboard,
     routes: [
       // Splash/Auth Routes
       GoRoute(
@@ -46,44 +39,26 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.register,
         builder: (context, state) => const RegisterPage(),
       ),
-      
+
       // Main App Routes with Bottom Navigation
       ShellRoute(
         builder: (context, state, child) => MainNavigation(child: child),
         routes: [
           GoRoute(
             path: AppRoutes.dashboard,
-            builder: (context, state) => const DashboardPage(),
+            builder: (context, state) => const DashboardScreen(),
           ),
           GoRoute(
             path: AppRoutes.expenses,
-            builder: (context, state) => const ExpensesPage(),
-            routes: [
-              GoRoute(
-                path: '/add',
-                builder: (context, state) => const AddExpensePage(),
-              ),
-            ],
+            builder: (context, state) => const ExpensesScreen(),
           ),
           GoRoute(
             path: AppRoutes.tasks,
-            builder: (context, state) => const TasksPage(),
-            routes: [
-              GoRoute(
-                path: '/add',
-                builder: (context, state) => const AddTaskPage(),
-              ),
-            ],
+            builder: (context, state) => const TasksScreen(),
           ),
           GoRoute(
             path: AppRoutes.goals,
             builder: (context, state) => const GoalsPage(),
-            routes: [
-              GoRoute(
-                path: '/add',
-                builder: (context, state) => const AddGoalPage(),
-              ),
-            ],
           ),
         ],
       ),
@@ -108,6 +83,130 @@ class SplashPage extends StatelessWidget {
             Text('Life Organizer', style: TextStyle(fontSize: 24)),
             SizedBox(height: 16),
             CircularProgressIndicator(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Login')),
+      body: const Center(
+        child: Text('Login Page - To be implemented'),
+      ),
+    );
+  }
+}
+
+class RegisterPage extends StatelessWidget {
+  const RegisterPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Register')),
+      body: const Center(
+        child: Text('Register Page - To be implemented'),
+      ),
+    );
+  }
+}
+
+class GoalsPage extends StatelessWidget {
+  const GoalsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Goals')),
+      body: const Center(
+        child: Text('Goals Page - To be implemented'),
+      ),
+    );
+  }
+}
+
+class MainNavigation extends StatefulWidget {
+  final Widget child;
+
+  const MainNavigation({super.key, required this.child});
+
+  @override
+  State<MainNavigation> createState() => _MainNavigationState();
+}
+
+class _MainNavigationState extends State<MainNavigation> {
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: widget.child,
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+          switch (index) {
+            case 0:
+              context.go(AppRoutes.dashboard);
+              break;
+            case 1:
+              context.go(AppRoutes.expenses);
+              break;
+            case 2:
+              context.go(AppRoutes.tasks);
+              break;
+            case 3:
+              context.go(AppRoutes.goals);
+              break;
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_wallet),
+            label: 'Expenses',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.task),
+            label: 'Tasks',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.flag),
+            label: 'Goals',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ErrorPage extends StatelessWidget {
+  const ErrorPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Error')),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 64, color: Colors.red),
+            SizedBox(height: 16),
+            Text('Page not found', style: TextStyle(fontSize: 18)),
+            SizedBox(height: 16),
+            Text('The requested page could not be found.'),
           ],
         ),
       ),
