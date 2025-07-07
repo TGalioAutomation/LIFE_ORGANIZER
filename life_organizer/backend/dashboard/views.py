@@ -314,113 +314,113 @@ class DashboardOverviewView(APIView):
             now = timezone.now()
             current_month = now.replace(day=1).date()
 
-        # Financial summary
-        transactions = Transaction.objects.filter(
-            user=user,
-            transaction_date__date__gte=current_month
-        )
+            # Financial summary
+            transactions = Transaction.objects.filter(
+                user=user,
+                transaction_date__date__gte=current_month
+            )
 
-        total_income = transactions.filter(transaction_type='income').aggregate(
-            total=Sum('amount')
-        )['total'] or 0
+            total_income = transactions.filter(transaction_type='income').aggregate(
+                total=Sum('amount')
+            )['total'] or 0
 
-        total_expenses = transactions.filter(transaction_type='expense').aggregate(
-            total=Sum('amount')
-        )['total'] or 0
+            total_expenses = transactions.filter(transaction_type='expense').aggregate(
+                total=Sum('amount')
+            )['total'] or 0
 
-        net_amount = total_income - total_expenses
+            net_amount = total_income - total_expenses
 
-        # Budget usage
-        budgets = Budget.objects.filter(user=user, month=current_month)
-        total_budget = budgets.aggregate(total=Sum('amount'))['total'] or 0
-        budget_used_percentage = (total_expenses / total_budget * 100) if total_budget > 0 else 0
+            # Budget usage
+            budgets = Budget.objects.filter(user=user, month=current_month)
+            total_budget = budgets.aggregate(total=Sum('amount'))['total'] or 0
+            budget_used_percentage = (total_expenses / total_budget * 100) if total_budget > 0 else 0
 
-        # Task summary
-        tasks = Task.objects.filter(
-            Q(created_by=user) | Q(assignee=user)
-        ).distinct()
+            # Task summary
+            tasks = Task.objects.filter(
+                Q(created_by=user) | Q(assignee=user)
+            ).distinct()
 
-        total_tasks = tasks.count()
-        completed_tasks = tasks.filter(status='done').count()
-        pending_tasks = tasks.filter(status__in=['todo', 'in_progress']).count()
-        overdue_tasks = tasks.filter(
-            due_date__lt=now,
-            status__in=['todo', 'in_progress']
-        ).count()
+            total_tasks = tasks.count()
+            completed_tasks = tasks.filter(status='done').count()
+            pending_tasks = tasks.filter(status__in=['todo', 'in_progress']).count()
+            overdue_tasks = tasks.filter(
+                due_date__lt=now,
+                status__in=['todo', 'in_progress']
+            ).count()
 
-        # Goal summary
-        goals = Goal.objects.filter(user=user)
-        total_goals = goals.count()
-        active_goals = goals.filter(status='active').count()
-        completed_goals = goals.filter(status='completed').count()
+            # Goal summary
+            goals = Goal.objects.filter(user=user)
+            total_goals = goals.count()
+            active_goals = goals.filter(status='active').count()
+            completed_goals = goals.filter(status='completed').count()
 
-        # Average goal progress - Fix the field name issue
-        active_goals_with_progress = goals.filter(status='active')
-        if active_goals_with_progress.exists():
-            # Calculate progress percentage from current_value and target_value
-            total_progress = 0
-            count = 0
-            for goal in active_goals_with_progress:
-                if goal.target_value and goal.target_value > 0:
-                    progress = (goal.current_value / goal.target_value) * 100
-                    total_progress += min(progress, 100)  # Cap at 100%
-                    count += 1
-            average_goal_progress = total_progress / count if count > 0 else 0
-        else:
-            average_goal_progress = 0
+            # Average goal progress - Fix the field name issue
+            active_goals_with_progress = goals.filter(status='active')
+            if active_goals_with_progress.exists():
+                # Calculate progress percentage from current_value and target_value
+                total_progress = 0
+                count = 0
+                for goal in active_goals_with_progress:
+                    if goal.target_value and goal.target_value > 0:
+                        progress = (goal.current_value / goal.target_value) * 100
+                        total_progress += min(progress, 100)  # Cap at 100%
+                        count += 1
+                average_goal_progress = total_progress / count if count > 0 else 0
+            else:
+                average_goal_progress = 0
 
-        # Recent data
-        recent_transactions = Transaction.objects.filter(user=user).order_by('-transaction_date')[:5]
-        upcoming_tasks = Task.objects.filter(
-            Q(created_by=user) | Q(assignee=user),
-            due_date__gte=now,
-            status__in=['todo', 'in_progress']
-        ).distinct().order_by('due_date')[:5]
+            # Recent data
+            recent_transactions = Transaction.objects.filter(user=user).order_by('-transaction_date')[:5]
+            upcoming_tasks = Task.objects.filter(
+                Q(created_by=user) | Q(assignee=user),
+                due_date__gte=now,
+                status__in=['todo', 'in_progress']
+            ).distinct().order_by('due_date')[:5]
 
-        goal_milestones = Goal.objects.filter(
-            user=user,
-            status='active'
-        ).order_by('target_date')[:5]
+            goal_milestones = Goal.objects.filter(
+                user=user,
+                status='active'
+            ).order_by('target_date')[:5]
 
-        overview_data = {
-            'total_income': float(total_income),
-            'total_expenses': float(total_expenses),
-            'net_amount': float(net_amount),
-            'budget_used_percentage': float(budget_used_percentage),
-            'total_tasks': total_tasks,
-            'completed_tasks': completed_tasks,
-            'pending_tasks': pending_tasks,
-            'overdue_tasks': overdue_tasks,
-            'total_goals': total_goals,
-            'active_goals': active_goals,
-            'completed_goals': completed_goals,
-            'average_goal_progress': float(average_goal_progress),
-            'recent_transactions': [
-                {
-                    'id': t.id,
-                    'description': t.description,
-                    'amount': float(t.amount),
-                    'type': t.transaction_type,
-                    'date': t.transaction_date
-                } for t in recent_transactions
-            ],
-            'upcoming_tasks': [
-                {
-                    'id': t.id,
-                    'title': t.title,
-                    'due_date': t.due_date,
-                    'priority': t.priority
-                } for t in upcoming_tasks
-            ],
-            'goal_milestones': [
-                {
-                    'id': g.id,
-                    'title': g.title,
-                    'progress': g.progress_percentage,
-                    'target_date': g.target_date
-                } for g in goal_milestones
-            ]
-        }
+            overview_data = {
+                'total_income': float(total_income),
+                'total_expenses': float(total_expenses),
+                'net_amount': float(net_amount),
+                'budget_used_percentage': float(budget_used_percentage),
+                'total_tasks': total_tasks,
+                'completed_tasks': completed_tasks,
+                'pending_tasks': pending_tasks,
+                'overdue_tasks': overdue_tasks,
+                'total_goals': total_goals,
+                'active_goals': active_goals,
+                'completed_goals': completed_goals,
+                'average_goal_progress': float(average_goal_progress),
+                'recent_transactions': [
+                    {
+                        'id': t.id,
+                        'description': t.description,
+                        'amount': float(t.amount),
+                        'type': t.transaction_type,
+                        'date': t.transaction_date
+                    } for t in recent_transactions
+                ],
+                'upcoming_tasks': [
+                    {
+                        'id': t.id,
+                        'title': t.title,
+                        'due_date': t.due_date,
+                        'priority': t.priority
+                    } for t in upcoming_tasks
+                ],
+                'goal_milestones': [
+                    {
+                        'id': g.id,
+                        'title': g.title,
+                        'progress': (g.current_value / g.target_value * 100) if g.target_value > 0 else 0,
+                        'target_date': g.target_date
+                    } for g in goal_milestones
+                ]
+            }
 
             return Response(overview_data)
         except Exception as e:

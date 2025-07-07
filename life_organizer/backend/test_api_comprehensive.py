@@ -9,7 +9,7 @@ import json
 import sys
 from datetime import datetime, timedelta
 
-BASE_URL = "http://localhost:8000/api"
+BASE_URL = "http://127.0.0.1:8000/api"
 
 class APITester:
     def __init__(self):
@@ -35,9 +35,10 @@ class APITester:
         print("\n🔐 Testing User Registration...")
         
         # Test successful registration
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         data = {
-            "username": f"testuser_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-            "email": "test@example.com",
+            "username": f"testuser_{timestamp}",
+            "email": f"test_{timestamp}@example.com",
             "first_name": "Test",
             "last_name": "User",
             "password": "testpass123",
